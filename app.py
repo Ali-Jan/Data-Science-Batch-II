@@ -265,7 +265,6 @@ def main():
         return
     
     # KPI Section
-    st.markdown("## Key Performance Indicators")
     
     total_sales, total_profit, total_orders, avg_profit_margin = create_kpi_metrics(filtered_df)
     
@@ -301,7 +300,6 @@ def main():
     
     # Charts Section
     st.markdown("---")
-    st.markdown("## Performance Analysis")
     
     # Row 1: Sales trend and region performance
     col1, col2 = st.columns(2)
