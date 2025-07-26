@@ -1,10 +1,3 @@
-# -*- coding: utf-8 -*-
-"""
-Spyder Editor
-
-This is a temporary script file.
-"""
-
 import streamlit as st
 import pandas as pd
 import plotly.express as px
@@ -48,26 +41,41 @@ st.markdown("""
 @st.cache_data
 def load_and_prepare_data():
     """Load and prepare the dataset"""
-    try:
-        # Try common file paths
-        file_paths = [
-            'Global_Superstore.csv',
-            '5. Data/Global_Superstore.csv',
-            'data/Global_Superstore.csv'
-        ]
-        
-        df = None
-        for path in file_paths:
+    # Try common file paths
+    file_paths = [
+        'Global_Superstore.csv',
+        '5. Data/Global_Superstore.csv',
+        'data/Global_Superstore.csv'
+    ]
+    
+    # Try different encodings
+    encodings = ['utf-8', 'latin-1', 'iso-8859-1', 'cp1252', 'utf-16']
+    
+    df = None
+    used_path = None
+    used_encoding = None
+    
+    for path in file_paths:
+        for encoding in encodings:
             try:
-                df = pd.read_csv(path, encoding='utf-8')
+                df = pd.read_csv(path, encoding=encoding)
+                used_path = path
+                used_encoding = encoding
                 break
-            except FileNotFoundError:
+            except (FileNotFoundError, UnicodeDecodeError, UnicodeError):
                 continue
+        if df is not None:
+            break
+    
+    if df is None:
+        st.error("⚠️ Could not load the CSV file. Please check if 'Global_Superstore.csv' exists and try uploading it again.")
+        return None
+    
+    try:
+        # Show success message with details
+        st.success(f"✅ Data loaded from {used_path} using {used_encoding} encoding")
         
-        if df is None:
-            st.error("⚠️ Data file 'Global_Superstore.csv' not found. Please ensure the file is uploaded to your repository.")
-            return None
-            
+        # Convert Order Date
         df['Order Date'] = pd.to_datetime(df['Order Date'], errors='coerce')
         
         # Calculate Profit Margin if not present
@@ -79,9 +87,20 @@ def load_and_prepare_data():
         # Remove any rows with invalid dates
         df = df.dropna(subset=['Order Date'])
         
+        # Basic data validation
+        required_columns = ['Region', 'Category', 'Sub-Category', 'Customer Name', 'Sales', 'Profit', 'Quantity']
+        missing_columns = [col for col in required_columns if col not in df.columns]
+        
+        if missing_columns:
+            st.error(f"⚠️ Missing required columns: {missing_columns}")
+            st.info("Available columns: " + ", ".join(df.columns.tolist()))
+            return None
+        
         return df
+        
     except Exception as e:
-        st.error(f"⚠️ Error loading data: {str(e)}")
+        st.error(f"⚠️ Error processing data: {str(e)}")
+        st.info("Please check your CSV file format and column names.")
         return None
 
 def create_kpi_metrics(df):
@@ -188,9 +207,6 @@ def main():
     
     if df is None:
         st.stop()
-    
-    # Success message
-    st.success(f"✅ Successfully loaded {len(df):,} records")
     
     # Sidebar filters
     st.sidebar.header("📋 Filters")
