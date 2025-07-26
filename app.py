@@ -11,7 +11,6 @@ warnings.filterwarnings('ignore')
 # Page configuration
 st.set_page_config(
     page_title="Global Superstore Dashboard",
-    page_icon="📊",
     layout="wide",
     initial_sidebar_state="expanded"
 )
@@ -68,12 +67,12 @@ def load_and_prepare_data():
             break
     
     if df is None:
-        st.error("⚠️ Could not load the CSV file. Please check if 'Global_Superstore.csv' exists and try uploading it again.")
+        st.error("Could not load the CSV file. Please check if 'Global_Superstore.csv' exists and try uploading it again.")
         return None
     
     try:
         # Show success message with details
-        st.success(f"✅ Data loaded from {used_path} using {used_encoding} encoding")
+        # st.success(f"Data loaded from {used_path} using {used_encoding} encoding")
         
         # Convert Order Date
         df['Order Date'] = pd.to_datetime(df['Order Date'], errors='coerce')
@@ -92,14 +91,14 @@ def load_and_prepare_data():
         missing_columns = [col for col in required_columns if col not in df.columns]
         
         if missing_columns:
-            st.error(f"⚠️ Missing required columns: {missing_columns}")
+            st.error(f"Missing required columns: {missing_columns}")
             st.info("Available columns: " + ", ".join(df.columns.tolist()))
             return None
         
         return df
         
     except Exception as e:
-        st.error(f"⚠️ Error processing data: {str(e)}")
+        st.error(f"Error processing data: {str(e)}")
         st.info("Please check your CSV file format and column names.")
         return None
 
@@ -200,7 +199,7 @@ def create_profitability_scatter(df):
 
 def main():
     # Header
-    st.markdown('<h1 class="main-header">🏪 Global Superstore Dashboard</h1>', unsafe_allow_html=True)
+    st.markdown('<h1 class="main-header">Global Superstore Dashboard</h1>', unsafe_allow_html=True)
     
     # Load data
     df = load_and_prepare_data()
@@ -209,7 +208,7 @@ def main():
         st.stop()
     
     # Sidebar filters
-    st.sidebar.header("📋 Filters")
+    st.sidebar.header("Filters")
     
     # Region filter
     regions = ['All'] + sorted(df['Region'].unique().tolist())
@@ -266,7 +265,7 @@ def main():
         return
     
     # KPI Section
-    st.markdown("## 📊 Key Performance Indicators")
+    st.markdown("## Key Performance Indicators")
     
     total_sales, total_profit, total_orders, avg_profit_margin = create_kpi_metrics(filtered_df)
     
@@ -274,35 +273,35 @@ def main():
     
     with col1:
         st.metric(
-            label="💰 Total Sales",
+            label="Total Sales",
             value=f"${total_sales:,.2f}",
             delta=f"{len(filtered_df)} orders"
         )
     
     with col2:
         st.metric(
-            label="📈 Total Profit",
+            label="Total Profit",
             value=f"${total_profit:,.2f}",
             delta=f"{total_profit/total_sales*100:.1f}% margin"
         )
     
     with col3:
         st.metric(
-            label="🛍️ Total Orders",
+            label="Total Orders",
             value=f"{total_orders:,}",
             delta=f"${total_sales/total_orders:.2f} avg"
         )
     
     with col4:
         st.metric(
-            label="📊 Avg Profit Margin",
+            label="Avg Profit Margin",
             value=f"{avg_profit_margin:.1f}%",
             delta="Per order"
         )
     
     # Charts Section
     st.markdown("---")
-    st.markdown("## 📈 Performance Analysis")
+    st.markdown("## Performance Analysis")
     
     # Row 1: Sales trend and region performance
     col1, col2 = st.columns(2)
@@ -327,7 +326,7 @@ def main():
     
     # Data Table Section
     st.markdown("---")
-    st.markdown("## 📋 Detailed Data")
+    st.markdown("## Detailed Data")
     
     # Show summary statistics
     with st.expander("Summary Statistics"):
@@ -345,7 +344,7 @@ def main():
     # Download option
     csv = filtered_df.to_csv(index=False)
     st.download_button(
-        label="📥 Download Filtered Data as CSV",
+        label="Download Filtered Data as CSV",
         data=csv,
         file_name=f"superstore_data_{datetime.now().strftime('%Y%m%d_%H%M%S')}.csv",
         mime="text/csv"
